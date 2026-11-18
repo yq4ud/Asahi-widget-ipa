@@ -1,0 +1,46 @@
+name: AsahiBusNavi
+options:
+  bundleIdPrefix: com.yq4uz
+  deploymentTarget:
+    iOS: "16.0"
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    CODE_SIGNING_ALLOWED: "NO"
+    CODE_SIGNING_REQUIRED: "NO"
+    CODE_SIGN_IDENTITY: ""
+
+targets:
+  AsahiBusNavi:
+    type: application
+    platform: iOS
+    sources:
+      - path: AsahiBusNavi
+      - path: Shared
+    info:
+      path: AsahiBusNavi/Info.plist
+    entitlements:
+      path: AsahiBusNavi/AsahiBusNavi.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.yq4uz.asahibusnavi
+    dependencies:
+      - target: AsahiBusWidget
+
+  AsahiBusWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: AsahiBusWidget
+      - path: Shared
+    info:
+      path: AsahiBusWidget/Info.plist
+    entitlements:
+      path: AsahiBusWidget/AsahiBusWidget.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.yq4uz.asahibusnavi
+    settings:
+      base:
+        INFOPLIST_KEY_NSExtension_NSExtensionPointIdentifier: com.apple.widgetkit-extension
