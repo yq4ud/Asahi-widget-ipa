@@ -1,0 +1,49 @@
+name: Build Unsigned IPA
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check directory structure
+        run: find . -maxdepth 3 -not -path '*/.*'
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode Project
+        run: xcodegen generate
+
+      - name: Build Unsigned App
+        run: |
+          xcodebuild build \
+            -project AsahiBusNavi.xcodeproj \
+            -scheme AsahiBusNavi \
+            -configuration Release \
+            -sdk iphoneos \
+            SYMROOT=$(pwd)/build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            AD_HOC_CODE_SIGNING_ALLOWED=YES
+
+      - name: Package IPA
+        run: |
+          mkdir -p build/Payload
+          cp -r build/Release-iphoneos/AsahiBusNavi.app build/Payload/
+          cd build
+          zip -r AsahiBusNavi.ipa Payload
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AsahiBusNavi-IPA
+          path: build/AsahiBusNavi.ipa
